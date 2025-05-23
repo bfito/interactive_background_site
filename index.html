@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>JPZune</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* Hide both vertical and horizontal scroll bars */
+    }
+
+    #vanta-bg {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .container-fluid, .container {
+      height: 100%;
+    }
+
+    .navbar {
+      position: fixed;
+      width: 100%;
+      background: transparent;
+      z-index: 1000;
+      border-bottom: none;
+    }
+
+    h1 {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: navajowhite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper" id="vanta-bg">
+    <!-- About Me -->
+    <section class="container-fluid" id="About">
+      <div class="container">
+        <h1>JP<br>ZUNE</h1>
+      </div>
+    </section>
+    <!-- About Me -->
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.21/vanta.net.min.js"></script>
+
+  <script>
+    VANTA.NET({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      maxDistance: 27.00,
+      color: 0xfff000,
+      backgroundColor: 0xa0a2a,
+    });
+
+    // Add device orientation listener
+    window.addEventListener('deviceorientation', (event) => {
+      if (event && event.beta !== null && event.gamma !== null) {
+        const { beta, gamma } = event; // beta is the front-back tilt, gamma is the left-right tilt
+        console.log('Device orientation detected:', { beta, gamma });
+
+        // Simulate mouse movement based on device tilt
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        // Calculate x and y positions based on the tilt
+        const x = (gamma / 90) * (screenWidth / 2) + (screenWidth / 2);
+        const y = (beta / 90) * (screenHeight / 2) + (screenHeight / 2);
+
+        console.log('Mapped positions:', { x, y });
+
+        // Create a mousemove event
+        const mouseEvent = new MouseEvent('mousemove', {
+          clientX: x,
+          clientY: y
+        });
+
+        // Dispatch the event on the Vanta background element
+        document.querySelector('#vanta-bg').dispatchEvent(mouseEvent);
+      } else {
+        console.log('Device orientation not supported or not available');
+      }
+    });
+
+    // Request permission for iOS 13+ devices
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      DeviceMotionEvent.requestPermission().then(permissionState => {
+        if (permissionState === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
+        } else {
+          console.log('Permission to access device orientation was denied');
+        }
+      }).catch(console.error);
+    }
+  </script>
+</body>
+</html>
